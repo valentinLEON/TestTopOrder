@@ -1,0 +1,49 @@
+﻿@using TestTopOrder.Data
+
+<MudContainer Style="width: 500px;" MaxWidth="MaxWidth.Large" class="pa-5">
+	<MudGrid>
+		<MudItem xs="12" class="text-center">
+			<MudCardMedia Image="@SelectedCountry.Flags.Svg" Height="250" />
+		</MudItem>
+		<MudItem xs="12">
+			<MudText Typo="Typo.body1"><b>Nom Officiel :</b> @SelectedCountry.Name.Official</MudText>
+			<MudText Typo="Typo.body1"><b>Capitale :</b> @string.Join(", ", SelectedCountry.Capital)</MudText>
+			<MudText Typo="Typo.body1"><b>Population :</b> @animatedPopulation.ToString("N0")</MudText>
+
+			<MudText Typo="Typo.body1"><b>Langue officelle :</b> @SelectedCountry.Languages.First().Value</MudText>
+			<MudText Typo="Typo.body1"><b>Continent :</b> @string.Join(", ", SelectedCountry.Continents)</MudText>
+			<MudText Typo="Typo.body1"><b>Monnaie du pays :</b> @string.Join(", ", SelectedCountry.Currencies.Select(x => x.Value.Name))</MudText>
+			<MudText Typo="Typo.body1"><b>Sigle de la monnaie :</b> @string.Join(", ", SelectedCountry.Currencies.Select(x => x.Value.Symbol))</MudText>
+			<MudText Typo="Typo.body1"><b>Pays indépendant :</b> @(SelectedCountry.Independent ? "Oui" : "Non")</MudText>
+		</MudItem>
+	</MudGrid>
+</MudContainer>
+
+@code {
+	[Parameter]
+	public CountryDto SelectedCountry { get; set; }
+
+	private long animatedPopulation = 0;
+	private readonly int duration = 2000;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await AnimatePopulation();
+	}
+
+	private async Task AnimatePopulation()
+	{
+		int step = 100;
+		long increment = SelectedCountry.Population / step; 
+
+		for (int i = 0; i < step; i++)
+		{
+			animatedPopulation += increment;
+			StateHasChanged();
+			await Task.Delay(duration / step);
+		}
+
+		animatedPopulation = SelectedCountry.Population;
+		StateHasChanged(); // notify the component to change
+	}
+}
